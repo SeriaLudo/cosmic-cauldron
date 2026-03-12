@@ -62,6 +62,14 @@ These are potential features to explore (not implemented):
 - Elements change state (solid/liquid/gas) based on their melt/boil points
 - Visual effects: freeze animation, melting glow, vaporizing particles
 
+### Atomic Structure Visualization
+- Canvas animation for any element using existing data
+- **Bohr-style** – electrons as dots on circular shells, rotating at different speeds (uses `shells`)
+- **Orbital clouds** – blurred circles or gradients for s/p/d/f shapes (parse `electron_configuration`)
+- **Pulsing** – electrons fade in/out or scale to suggest probability (visual only)
+- **Temperature** – faster motion at higher temp; use `melt` and `boil` for phase boundaries
+- All driven by: `shells`, `electron_configuration`, `melt`, `boil`, `number`, `atomic_mass`
+
 ### Cosmic Cauldron
 - Select multiple elements to "mix" together
 - Show what compounds they form (requires compound database)
