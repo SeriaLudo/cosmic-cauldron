@@ -1,28 +1,37 @@
-import { X } from 'lucide-react'
-import type { Element } from '../types/element'
+import { useEffect, useRef } from "react";
+import { X } from "lucide-react";
+import type { Element } from "#/types/element";
 
 interface ElementModalProps {
-  element: Element
-  onClose: () => void
+  element: Element;
+  onClose: () => void;
 }
 
-export default function ElementModal({ element, onClose }: ElementModalProps) {
+export default function ElementModal({
+  element,
+  onClose,
+}: Readonly<ElementModalProps>) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    dialogRef.current?.showModal();
+    return () => dialogRef.current?.close();
+  }, []);
+
+  const handleClose = () => dialogRef.current?.close();
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
+    <dialog
+      ref={dialogRef}
+      onClose={onClose}
+      className="fixed inset-0 z-50 m-0 flex max-h-none w-full max-w-none items-center justify-center border-none bg-transparent p-4 backdrop:bg-black/60 backdrop:backdrop-blur-sm"
       aria-modal="true"
       aria-labelledby={`element-${element.number}-title`}
     >
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-auto rounded-2xl border border-[var(--element-border)] bg-[var(--modal-bg)] p-6 shadow-[0_0_40px_rgba(255,215,0,0.2)]">
+      <div className="relative max-h-[90vh] w-full max-w-2xl overflow-auto rounded-2xl border border-(--element-border) bg-(--modal-bg) p-6 shadow-[0_0_40px_rgba(255,215,0,0.2)]">
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute right-4 top-4 rounded-full p-1 text-white/70 hover:bg-white/10 hover:text-white"
           aria-label="Close modal"
         >
@@ -30,11 +39,11 @@ export default function ElementModal({ element, onClose }: ElementModalProps) {
         </button>
 
         <header className="mb-6 flex items-center gap-4">
-          <div className="flex h-20 w-20 flex-col items-center justify-center rounded-lg border border-[var(--element-border)] bg-[var(--element-bg)] shadow-[0_0_15px_rgba(255,215,0,0.2)]">
-            <span className="text-3xl font-bold text-[var(--element-symbol)]">
+          <div className="flex h-20 w-20 flex-col items-center justify-center rounded-lg border border-(--element-border) bg-(--element-bg) shadow-[0_0_15px_rgba(255,215,0,0.2)]">
+            <span className="text-3xl font-bold text-(--element-symbol)">
               {element.symbol}
             </span>
-            <span className="text-sm text-[var(--element-number)]">
+            <span className="text-sm text-(--element-number)">
               {element.number}
             </span>
           </div>
@@ -50,9 +59,7 @@ export default function ElementModal({ element, onClose }: ElementModalProps) {
         </header>
 
         <section className="mb-6">
-          <p className="leading-relaxed text-white/80">
-            {element.summary}
-          </p>
+          <p className="leading-relaxed text-white/80">{element.summary}</p>
         </section>
 
         <div className="grid grid-cols-2 gap-4 rounded-xl bg-white/10 p-4">
@@ -85,7 +92,7 @@ export default function ElementModal({ element, onClose }: ElementModalProps) {
               Group
             </span>
             <span className="text-lg font-semibold text-white">
-              {element.group ?? 'N/A'}
+              {element.group ?? "N/A"}
             </span>
           </div>
           <div>
@@ -93,7 +100,7 @@ export default function ElementModal({ element, onClose }: ElementModalProps) {
               Density
             </span>
             <span className="text-lg font-semibold text-white">
-              {element.density ? `${element.density} g/L` : 'N/A'}
+              {element.density ? `${element.density} g/L` : "N/A"}
             </span>
           </div>
           <div>
@@ -110,7 +117,7 @@ export default function ElementModal({ element, onClose }: ElementModalProps) {
           <h3 className="mb-2 text-lg font-semibold text-white">
             Electron Configuration
           </h3>
-          <code className="block break-all rounded-lg bg-[#0d1b2a] border border-[#ffd700]/30 p-3 text-sm text-[#ffd700] whitespace-pre-wrap font-mono">
+          <code className="block break-all rounded-lg bg-black border border-[#ffd700]/30 p-3 text-sm text-[#ffd700] whitespace-pre-wrap font-mono">
             {element.electron_configuration}
           </code>
         </section>
@@ -172,6 +179,6 @@ export default function ElementModal({ element, onClose }: ElementModalProps) {
           </section>
         )}
       </div>
-    </div>
-  )
+    </dialog>
+  );
 }
