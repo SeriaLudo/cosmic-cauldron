@@ -1,6 +1,25 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
+
 import type { Element } from "#/types/element";
+
+function formatElectronConfig(value: string): ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  const re = /([spdf])(\d+)/g;
+  let lastIndex = 0;
+  let match;
+  let key = 0;
+  while ((match = re.exec(value)) !== null) {
+    parts.push(
+      value.slice(lastIndex, match.index),
+      match[1],
+      <sup key={`ec-${key++}`}>{match[2]}</sup>,
+    );
+    lastIndex = re.lastIndex;
+  }
+  parts.push(value.slice(lastIndex));
+  return parts;
+}
 
 interface ElementModalProps {
   element: Element;
@@ -28,6 +47,11 @@ export default function ElementModal({
       aria-modal="true"
       aria-labelledby={`element-${element.number}-title`}
     >
+      <div
+        className="absolute inset-0 -z-10"
+        aria-hidden="true"
+        onClick={handleClose}
+      />
       <div className="relative max-h-[90vh] w-full max-w-2xl overflow-auto rounded-2xl border border-(--element-border) bg-(--modal-bg) p-6 shadow-[0_0_40px_rgba(255,215,0,0.2)]">
         <button
           type="button"
@@ -118,7 +142,7 @@ export default function ElementModal({
             Electron Configuration
           </h3>
           <code className="block break-all rounded-lg bg-black border border-[#ffd700]/30 p-3 text-sm text-[#ffd700] whitespace-pre-wrap font-mono">
-            {element.electron_configuration}
+            {formatElectronConfig(element.electron_configuration_semantic)}
           </code>
         </section>
 
