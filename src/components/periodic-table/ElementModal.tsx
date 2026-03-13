@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 
 import type { Element } from "#/types/element";
+import { getElementPhase } from "../../machines/temperatureMachine";
 
 function formatElectronConfig(value: string): ReactNode[] {
   const parts: React.ReactNode[] = [];
@@ -23,11 +24,13 @@ function formatElectronConfig(value: string): ReactNode[] {
 
 interface ElementModalProps {
   element: Element;
+  temperature?: number;
   onClose: () => void;
 }
 
 export default function ElementModal({
   element,
+  temperature = 298,
   onClose,
 }: Readonly<ElementModalProps>) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -38,6 +41,9 @@ export default function ElementModal({
   }, []);
 
   const handleClose = () => dialogRef.current?.close();
+
+  // Calculate phase based on temperature
+  const currentPhase = getElementPhase(temperature, element.melt, element.boil);
 
   return (
     <dialog
@@ -99,8 +105,8 @@ export default function ElementModal({
             <span className="block text-xs uppercase tracking-wider text-[#ffd700]">
               Phase
             </span>
-            <span className="text-lg font-semibold text-white">
-              {element.phase}
+            <span className="text-lg font-semibold text-white capitalize">
+              {currentPhase}
             </span>
           </div>
           <div>

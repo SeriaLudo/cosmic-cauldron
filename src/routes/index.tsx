@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { PeriodicTable } from '../components/periodic-table'
 import { Sidebar, TopBar } from '../components/sidebar'
 import { getTemperatureColor } from '../machines/temperatureMachine'
+import type { Element, PeriodicTableData } from '../types/element'
 
 export const Route = createFileRoute('/')({
   component: PeriodicTablePage,
@@ -11,9 +12,20 @@ export const Route = createFileRoute('/')({
 function PeriodicTablePage() {
   const [temperature, setTemperature] = useState(298)
   const [isActive, setIsActive] = useState(false)
-
+  const [elements, setElements] = useState<Element[]>([])
+  const [loading, setLoading] = useState(true)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    fetch('/periodic-table.json')
+      .then((res) => res.json())
+      .then((data: PeriodicTableData) => {
+        setElements(data.elements)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
 
   useEffect(() => {
     if (isActive) {
@@ -42,12 +54,15 @@ function PeriodicTablePage() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <Sidebar 
-        onTemperatureChange={handleTemperatureChange}
-        onActiveChange={handleActiveChange}
-        onReset={handleReset}
-        onOpenChange={setSidebarOpen}
-      />
+      {!loading && (
+        <Sidebar 
+          elements={elements}
+          onTemperatureChange={handleTemperatureChange}
+          onActiveChange={handleActiveChange}
+          onReset={handleReset}
+          onOpenChange={setSidebarOpen}
+        />
+      )}
 
       {/* Mobile TopBar */}
       <TopBar 

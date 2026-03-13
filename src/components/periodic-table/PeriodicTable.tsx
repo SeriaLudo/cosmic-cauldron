@@ -75,6 +75,7 @@ export default function PeriodicTable({ temperature = 298, isActive = false }: P
       {selectedElement && (
         <ElementModal
           element={selectedElement}
+          temperature={temperature}
           onClose={() => setSelectedElement(null)}
         />
       )}
