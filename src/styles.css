@@ -390,6 +390,16 @@ a {
   animation: gas-flicker 1.5s ease-in-out infinite;
 }
 
+/* Pause phase animation on hover/focus so the highlight takes priority */
+.element-card.solid:hover,
+.element-card.solid:focus,
+.element-card.liquid:hover,
+.element-card.liquid:focus,
+.element-card.gas:hover,
+.element-card.gas:focus {
+  animation-play-state: paused;
+}
+
 /* 
  * Temperature Background Overlay
  * Applied to body when temperature is active

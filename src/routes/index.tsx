@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { useThrottledCallback } from '@tanstack/react-pacer'
 import { PeriodicTable } from '../components/periodic-table'
 import { Sidebar, TopBar } from '../components/sidebar'
 import { getTemperatureColor } from '../machines/temperatureMachine'
@@ -38,9 +39,13 @@ function PeriodicTablePage() {
     }
   }, [temperature, isActive])
 
-  const handleTemperatureChange = (temp: number) => {
-    setTemperature(temp)
-  }
+  // Throttle temperature updates to reduce re-renders when dragging the slider.
+  // Sidebar/TopBar still update their local xstate immediately for responsive UI;
+  // the route state (and PeriodicTable) updates at most every 100ms.
+  const handleTemperatureChange = useThrottledCallback(
+    (temp: number) => setTemperature(temp),
+    { wait: 100 },
+  )
 
   const handleActiveChange = (active: boolean) => {
     setIsActive(active)
