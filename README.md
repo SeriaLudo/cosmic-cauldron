@@ -22,6 +22,7 @@ npm run build
 - **TanStack Start** - Full-stack React framework with file-based routing
 - **TanStack Router** - Type-safe routing with automatic route generation
 - **React 19** - UI library
+- **XState** - State machine for temperature and element phase transitions
 - **Tailwind CSS v4** - Utility-first CSS framework
 - **CSS Grid** - Used for the periodic table layout (18 columns × 10 rows)
 - **CSS Custom Properties** - Theme variables for dark/light mode and component styling
@@ -58,7 +59,7 @@ The app features a "cosmic night sky" theme:
 These are potential features to explore (not implemented):
 
 ### Temperature State
-- Add Zustand state for temperature (0K - 6000K slider)
+- Add XState for temperature (0K - 6000K slider)
 - Elements change state (solid/liquid/gas) based on their melt/boil points
 - Visual effects: freeze animation, melting glow, vaporizing particles
 

@@ -1,9 +1,16 @@
-import { useState, useEffect } from 'react'
-import type { Element, PeriodicTableData } from '../types/element'
+import { useState, useEffect, useMemo } from 'react'
+import type { Element, PeriodicTableData } from '../../types/element'
+import type { TemperaturePhase } from '../../machines/temperatureMachine'
+import { getElementPhase } from '../../machines/temperatureMachine'
 import ElementCard from './ElementCard'
 import ElementModal from './ElementModal'
 
-export default function PeriodicTable() {
+interface PeriodicTableProps {
+  temperature?: number
+  isActive?: boolean
+}
+
+export default function PeriodicTable({ temperature = 298, isActive = false }: PeriodicTableProps) {
   const [elements, setElements] = useState<Element[]>([])
   const [selectedElement, setSelectedElement] = useState<Element | null>(null)
   const [loading, setLoading] = useState(true)
@@ -24,6 +31,15 @@ export default function PeriodicTable() {
         setLoading(false)
       })
   }, [])
+
+  // Compute phase for each element based on temperature
+  const elementPhases = useMemo(() => {
+    const phases: Record<number, TemperaturePhase> = {}
+    elements.forEach((element) => {
+      phases[element.number] = getElementPhase(temperature, element.melt, element.boil)
+    })
+    return phases
+  }, [elements, temperature])
 
   if (loading) {
     return (
@@ -49,6 +65,7 @@ export default function PeriodicTable() {
             <ElementCard
               key={element.number}
               element={element}
+              phase={isActive ? elementPhases[element.number] : undefined}
               onClick={() => setSelectedElement(element)}
             />
           ))}
