@@ -1,52 +1,59 @@
-import { useState, useEffect, useMemo } from 'react'
-import type { Element, PeriodicTableData } from '../../types/element'
-import type { TemperaturePhase } from '../../machines/temperatureMachine'
-import { getElementPhase } from '../../machines/temperatureMachine'
-import ElementCard from './ElementCard'
-import ElementModal from './ElementModal'
+import { useState, useEffect, useMemo } from "react";
+import type { Element, PeriodicTableData } from "../../types/element";
+import type { TemperaturePhase } from "../../machines/temperatureMachine";
+import { getElementPhase } from "../../machines/temperatureMachine";
+import ElementCard from "./ElementCard";
+import ElementModal from "./ElementModal";
 
 interface PeriodicTableProps {
-  temperature?: number
-  isActive?: boolean
+  temperature?: number;
+  isActive?: boolean;
 }
 
-export default function PeriodicTable({ temperature = 298, isActive = false }: PeriodicTableProps) {
-  const [elements, setElements] = useState<Element[]>([])
-  const [selectedElement, setSelectedElement] = useState<Element | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export default function PeriodicTable({
+  temperature = 298,
+  isActive = false,
+}: PeriodicTableProps) {
+  const [elements, setElements] = useState<Element[]>([]);
+  const [selectedElement, setSelectedElement] = useState<Element | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/periodic-table.json')
+    fetch("/periodic-table.json")
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to load periodic table data')
-        return res.json()
+        if (!res.ok) throw new Error("Failed to load periodic table data");
+        return res.json();
       })
       .then((data: PeriodicTableData) => {
-        setElements(data.elements)
-        setLoading(false)
+        setElements(data.elements);
+        setLoading(false);
       })
       .catch((err) => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }, [])
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
   // Compute phase for each element based on temperature
   const elementPhases = useMemo(() => {
-    const phases: Record<number, TemperaturePhase> = {}
+    const phases: Record<number, TemperaturePhase> = {};
     elements.forEach((element) => {
-      phases[element.number] = getElementPhase(temperature, element.melt, element.boil)
-    })
-    return phases
-  }, [elements, temperature])
+      phases[element.number] = getElementPhase(
+        temperature,
+        element.melt,
+        element.boil
+      );
+    });
+    return phases;
+  }, [elements, temperature]);
 
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-lg text-white/70">Loading periodic table...</div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -54,7 +61,7 @@ export default function PeriodicTable({ temperature = 298, isActive = false }: P
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-lg text-red-400">Error: {error}</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -81,14 +88,13 @@ export default function PeriodicTable({ temperature = 298, isActive = false }: P
       )}
 
       <div className="mt-8 text-center text-sm text-white/60">
-        <p>
-          Click on an element to view detailed information.
-        </p>
+        <p>Click on an element to view detailed information.</p>
         <p className="mt-2">
-          <strong className="text-white/80">Note:</strong> On mobile, scroll horizontally to view the full table.
-          Pinch to zoom for better visibility on small screens.
+          <strong className="text-white/80">Note:</strong> On mobile, scroll
+          horizontally to view the full table. Pinch to zoom for better
+          visibility on small screens.
         </p>
       </div>
     </>
-  )
+  );
 }

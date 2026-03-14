@@ -44,6 +44,7 @@ Elements are positioned using inline styles with `gridColumn` and `gridRow` from
 ## Theme
 
 The app features a "cosmic night sky" theme:
+
 - Deep navy background (`#0d1b2a`)
 - Element cards with radial gradients and glowing gold borders
 - Gold accents throughout for a star-like appearance
@@ -59,11 +60,13 @@ The app features a "cosmic night sky" theme:
 These are potential features to explore (not implemented):
 
 ### Temperature State
+
 - Add XState for temperature (0K - 6000K slider)
 - Elements change state (solid/liquid/gas) based on their melt/boil points
 - Visual effects: freeze animation, melting glow, vaporizing particles
 
 ### Atomic Structure Visualization
+
 - Canvas animation for any element using existing data
 - **Bohr-style** – electrons as dots on circular shells, rotating at different speeds (uses `shells`)
 - **Orbital clouds** – blurred circles or gradients for s/p/d/f shapes (parse `electron_configuration`)
@@ -72,17 +75,20 @@ These are potential features to explore (not implemented):
 - All driven by: `shells`, `electron_configuration`, `melt`, `boil`, `number`, `atomic_mass`
 
 ### Cosmic Cauldron
+
 - Select multiple elements to "mix" together
 - Show what compounds they form (requires compound database)
 - Display reaction equations and product properties
 
 ### Biological Presets
+
 - Show which elements exist in a human body (with percentages)
 - Presets for: human, dog, cat, oak tree, rose, E. coli
 - Cosmic: Moon, Mars, Jupiter, Sun composition
 - Educational comparison views
 
 ### Element Category Overlays
+
 - Color-code by category: noble gases, alkali metals, halogens, etc.
 - Toggle overlays on/off
 - Filter table by category

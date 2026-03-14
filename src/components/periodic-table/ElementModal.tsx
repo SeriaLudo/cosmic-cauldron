@@ -14,7 +14,7 @@ function formatElectronConfig(value: string): ReactNode[] {
     parts.push(
       value.slice(lastIndex, match.index),
       match[1],
-      <sup key={`ec-${key++}`}>{match[2]}</sup>,
+      <sup key={`ec-${key++}`}>{match[2]}</sup>
     );
     lastIndex = re.lastIndex;
   }
