@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { Element } from "#/types/element";
 import type { TemperaturePhase } from "#/machines/temperatureMachine";
 
@@ -12,25 +13,19 @@ export default function ElementCard({
   onClick,
   phase,
 }: Readonly<ElementCardProps>) {
-  // Build dynamic classes based on phase (solid/liquid/gas)
-  const baseClass = "element-card group relative flex flex-col items-center justify-center rounded border border-[#ffd700]/50 bg-[var(--element-bg)] p-1 text-center transition-transform transition-colors duration-200 hover:scale-110 hover:border-[#ffd700] hover:shadow-[0_0_25px_rgba(255,215,0,0.6),0_0_50px_rgba(255,215,0,0.3)] focus:outline-none focus:ring-2 focus:ring-[#ffd700]/50"
-  
-  // Add phase animation class if provided
-  const phaseClass = phase ? phase : ''
-  const combinedClass = phase ? `${baseClass} ${phaseClass}` : baseClass
-
   return (
     <button
       type="button"
       onClick={onClick}
-      className={combinedClass}
+      className={clsx(
+        "element-card group relative flex flex-col items-center justify-center rounded border border-[#ffd700]/50 p-1 text-center transition-transform transition-colors duration-200 hover:scale-110 hover:border-[#ffd700] hover:shadow-[0_0_25px_rgba(255,215,0,0.6),0_0_50px_rgba(255,215,0,0.3)] focus:outline-none focus:ring-2 focus:ring-[#ffd700]/50",
+        "bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15)_0%,transparent_70%),var(--element-bg)]",
+        "shadow-[0_0_8px_rgba(255,215,0,0.2),inset_0_0_10px_rgba(255,215,0,0.05)]",
+        phase
+      )}
       style={{
         gridColumn: element.xpos,
         gridRow: element.ypos,
-        background:
-          "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 70%), var(--element-bg)",
-        boxShadow:
-          "0 0 8px rgba(255,215,0,0.2), inset 0 0 10px rgba(255,215,0,0.05)",
       }}
       title={element.name}
     >
