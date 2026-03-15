@@ -177,8 +177,11 @@ export function getTemperatureColor(temperature: number): string {
   const t = Math.min(Math.max(temperature / 6000, 0), 1);
 
   if (t < 0.25) {
-    // Cold: icy blue (#4169e1) to cool blue (#1e90ff)
-    return `rgb(${Math.round(65 + t * 4 * 80)}, ${Math.round(105 + t * 4 * 80)}, ${Math.round(225 - t * 4 * 30)})`;
+    // Cold: icy blue-white at 0K, transitioning to cool blue (#1e90ff)
+    const icyBlueWhite = [100, 240, 255]; // rgb at 0K
+    const coolBlue = [30, 144, 255]; // #1e90ff at t=0.25
+    const scale = t * 4; // 0..1 over the cold range
+    return `rgb(${Math.round(icyBlueWhite[0] + scale * (coolBlue[0] - icyBlueWhite[0]))}, ${Math.round(icyBlueWhite[1] + scale * (coolBlue[1] - icyBlueWhite[1]))}, ${Math.round(icyBlueWhite[2] + scale * (coolBlue[2] - icyBlueWhite[2]))})`;
   } else if (t < 0.5) {
     // Cool to warm: blue (#1e90ff) to orange (#ffa500)
     const normalized = (t - 0.25) * 4;

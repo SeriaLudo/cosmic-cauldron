@@ -270,6 +270,11 @@ a {
   min-height: 56px;
 }
 
+/* Isolate repaint when no phase animation (glow needs overflow visible) */
+.element-card:not(.solid):not(.liquid):not(.gas) {
+  contain: paint;
+}
+
 .element-number {
   position: absolute;
   top: 3px;
@@ -308,96 +313,115 @@ a {
 
 /* ============================================
    Temperature-based Element Animations
-   ============================================ */
+   ============================================
+   Original full box-shadow styling on ::before pseudo-element.
+   Static shadow + scale/opacity animation (compositor-only).
+   */
+
+/* Shared pseudo-element setup */
+.element-card.solid::before,
+.element-card.liquid::before,
+.element-card.gas::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  z-index: -1;
+  pointer-events: none;
+  transform-origin: center;
+}
 
 /* 
  * SOLID STATE
- * Ice/frozen effect - subtle crystalline shimmer
+ * Ice/frozen effect - original crystalline shimmer
  */
-@keyframes solid-shimmer {
-  0%,
-  100% {
-    box-shadow:
-      0 0 8px rgba(65, 105, 225, 0.3),
-      inset 0 0 10px rgba(65, 105, 225, 0.1);
-  }
-  50% {
-    box-shadow:
-      0 0 15px rgba(65, 105, 225, 0.5),
-      inset 0 0 15px rgba(65, 105, 225, 0.2);
-  }
+.element-card.solid {
+  border-radius: 10px;
 }
 
-.element-card.solid {
-  animation: solid-shimmer 3s ease-in-out infinite;
+.element-card.solid::before {
+  box-shadow:
+    0 0 8px rgba(65, 105, 225, 0.3),
+    0 0 15px rgba(65, 105, 225, 0.5),
+    inset 0 0 10px rgba(65, 105, 225, 0.1),
+    inset 0 0 15px rgba(65, 105, 225, 0.2);
+  animation: glow-ripple 3s ease-in-out infinite;
+  animation-delay: var(--animation-delay, 0s);
 }
 
 /* 
  * LIQUID STATE
- * Melting/glowing effect - gentle warm pulse
+ * Melting/glowing effect - original warm pulse
  */
-@keyframes liquid-glow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 12px rgba(255, 165, 0, 0.3),
-      inset 0 0 15px rgba(255, 165, 0, 0.15);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow:
-      0 0 20px rgba(255, 165, 0, 0.5),
-      inset 0 0 20px rgba(255, 165, 0, 0.25);
-    transform: scale(1.02);
-  }
+.element-card.liquid {
+  border-radius: 10px;
+  animation: liquid-scale 2s ease-in-out infinite;
+  animation-delay: var(--animation-delay, 0s);
 }
 
-.element-card.liquid {
-  animation: liquid-glow 2s ease-in-out infinite;
+.element-card.liquid::before {
+  box-shadow:
+    0 0 12px rgba(255, 165, 0, 0.3),
+    0 0 20px rgba(255, 165, 0, 0.5),
+    inset 0 0 15px rgba(255, 165, 0, 0.15),
+    inset 0 0 20px rgba(255, 165, 0, 0.25);
+  animation: glow-ripple 2s ease-in-out infinite;
+  animation-delay: var(--animation-delay, 0s);
 }
 
 /* 
  * GAS STATE  
- * Vaporizing effect - energetic flicker
+ * Vaporizing effect - original energetic flicker
  */
-@keyframes gas-flicker {
+.element-card.gas {
+  border-radius: 10px;
+}
+
+.element-card.gas::before {
+  box-shadow:
+    0 0 15px rgba(255, 69, 0, 0.4),
+    0 0 30px rgba(255, 69, 0, 0.2),
+    0 0 25px rgba(255, 100, 0, 0.7),
+    0 0 50px rgba(255, 100, 0, 0.4),
+    inset 0 0 20px rgba(255, 69, 0, 0.2),
+    inset 0 0 30px rgba(255, 100, 0, 0.35);
+  animation: glow-ripple-fast 1.5s ease-in-out infinite;
+  animation-delay: var(--animation-delay, 0s);
+}
+
+/* Scale + opacity for ripple (compositor-only) */
+@keyframes glow-ripple {
   0%,
   100% {
-    box-shadow:
-      0 0 15px rgba(255, 69, 0, 0.4),
-      0 0 30px rgba(255, 69, 0, 0.2),
-      inset 0 0 20px rgba(255, 69, 0, 0.2);
     transform: scale(1);
-    opacity: 1;
-  }
-  25% {
-    box-shadow:
-      0 0 20px rgba(255, 69, 0, 0.6),
-      0 0 40px rgba(255, 69, 0, 0.3),
-      inset 0 0 25px rgba(255, 69, 0, 0.3);
-    transform: scale(1.03);
-    opacity: 0.95;
+    opacity: 0.8;
   }
   50% {
-    box-shadow:
-      0 0 25px rgba(255, 100, 0, 0.7),
-      0 0 50px rgba(255, 100, 0, 0.4),
-      inset 0 0 30px rgba(255, 100, 0, 0.35);
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
-  75% {
-    box-shadow:
-      0 0 20px rgba(255, 69, 0, 0.6),
-      0 0 40px rgba(255, 69, 0, 0.3),
-      inset 0 0 25px rgba(255, 69, 0, 0.3);
-    transform: scale(1.03);
-    opacity: 0.95;
+    transform: scale(1.1);
+    opacity: 1;
   }
 }
 
-.element-card.gas {
-  animation: gas-flicker 1.5s ease-in-out infinite;
+@keyframes glow-ripple-fast {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes liquid-scale {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
 }
 
 /* Pause phase animation on hover/focus so the highlight takes priority */
@@ -407,6 +431,14 @@ a {
 .element-card.liquid:focus,
 .element-card.gas:hover,
 .element-card.gas:focus {
+  animation-play-state: paused;
+}
+.element-card.solid:hover::before,
+.element-card.solid:focus::before,
+.element-card.liquid:hover::before,
+.element-card.liquid:focus::before,
+.element-card.gas:hover::before,
+.element-card.gas:focus::before {
   animation-play-state: paused;
 }
 

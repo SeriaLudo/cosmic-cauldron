@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import type { Element, PeriodicTableData } from "../../types/element";
 import type { TemperaturePhase } from "../../machines/temperatureMachine";
 import { getElementPhase } from "../../machines/temperatureMachine";
@@ -13,7 +13,7 @@ interface PeriodicTableProps {
 export default function PeriodicTable({
   temperature = 298,
   isActive = false,
-}: PeriodicTableProps) {
+}: Readonly<PeriodicTableProps>) {
   const [elements, setElements] = useState<Element[]>([]);
   const [selectedElement, setSelectedElement] = useState<Element | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,6 +48,28 @@ export default function PeriodicTable({
     return phases;
   }, [elements, temperature]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const elementsRef = useRef(elements);
+  elementsRef.current = elements;
+
+  const handleCardClick = useCallback((e: Event) => {
+    const card = (e.target as HTMLElement).closest<HTMLElement>(
+      "[data-element-number]"
+    );
+    if (card?.dataset.elementNumber) {
+      const num = Number(card.dataset.elementNumber);
+      const element = elementsRef.current.find((el) => el.number === num);
+      if (element) setSelectedElement(element);
+    }
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    container.addEventListener("click", handleCardClick);
+    return () => container.removeEventListener("click", handleCardClick);
+  }, [handleCardClick, loading]);
+
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -67,13 +89,16 @@ export default function PeriodicTable({
   return (
     <>
       <div className="periodic-table-container overflow-x-auto pb-4">
-        <div className="periodic-table relative mx-auto min-w-[900px] max-w-[1400px]">
+        <div
+          ref={containerRef}
+          className="periodic-table relative mx-auto min-w-[900px] max-w-[1400px]"
+        >
           {elements.map((element) => (
             <ElementCard
               key={element.number}
               element={element}
               phase={isActive ? elementPhases[element.number] : undefined}
-              onClick={() => setSelectedElement(element)}
+              data-element-number={element.number}
             />
           ))}
         </div>

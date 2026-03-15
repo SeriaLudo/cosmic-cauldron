@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useDeferredValue } from "react";
 import { useMachine } from "@xstate/react";
 import {
   temperatureMachine,
@@ -6,6 +6,7 @@ import {
 } from "../../machines/temperatureMachine";
 import { PeriodicTable } from "../periodic-table";
 import { Sidebar, TopBar } from "../sidebar";
+import TemperatureBodyEffect from "../TemperatureBodyEffect";
 import type { Element, PeriodicTableData } from "../../types/element";
 
 export default function PeriodicTablePage() {
@@ -14,6 +15,7 @@ export default function PeriodicTablePage() {
   const [loading, setLoading] = useState(true);
 
   const { temperature, isActive } = state.context;
+  const deferredTemperature = useDeferredValue(temperature);
 
   useEffect(() => {
     fetch("/periodic-table.json")
@@ -25,19 +27,9 @@ export default function PeriodicTablePage() {
       .catch(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (isActive) {
-      const color = getTemperatureColor(temperature);
-      document.documentElement.style.setProperty("--temp-glow", color);
-      document.body.classList.add("temperature-active");
-    } else {
-      document.documentElement.style.removeProperty("--temp-glow");
-      document.body.classList.remove("temperature-active");
-    }
-  }, [temperature, isActive]);
-
   return (
     <>
+      <TemperatureBodyEffect isActive={isActive} temperature={temperature} />
       {/* Desktop Sidebar */}
       {!loading && <Sidebar state={state} send={send} elements={elements} />}
 
@@ -64,7 +56,10 @@ export default function PeriodicTablePage() {
             Interactive periodic table with detailed element information
           </p>
         </header>
-        <PeriodicTable temperature={temperature} isActive={isActive} />
+        <PeriodicTable
+          temperature={deferredTemperature}
+          isActive={isActive}
+        />
       </main>
     </>
   );
