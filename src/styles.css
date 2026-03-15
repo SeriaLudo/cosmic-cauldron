@@ -270,11 +270,6 @@ a {
   min-height: 56px;
 }
 
-/* Isolate repaint when no phase animation (glow needs overflow visible) */
-.element-card:not(.solid):not(.liquid):not(.gas) {
-  contain: paint;
-}
-
 .element-number {
   position: absolute;
   top: 3px;
@@ -316,6 +311,7 @@ a {
    ============================================
    Original full box-shadow styling on ::before pseudo-element.
    Static shadow + scale/opacity animation (compositor-only).
+   See ANIMATION_PERFORMANCE.md for why this approach is faster.
    */
 
 /* Shared pseudo-element setup */

@@ -55,10 +55,9 @@ export const temperatureMachine = setup({
     deactivate: assign({
       isActive: false,
     }),
-    // Reset to defaults
+    // Reset temperature to room temp (keeps isActive unchanged)
     resetTemperature: assign({
       temperature: 298, // Room temperature ~25°C
-      isActive: false,
     }),
     // Sidebar visibility
     toggleSidebar: assign({

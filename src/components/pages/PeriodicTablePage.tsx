@@ -48,7 +48,7 @@ export default function PeriodicTablePage() {
       )}
 
       <main className="page-wrap px-4 pb-8 pt-20 lg:pt-6">
-        <header className="mb-8 text-center lg:text-left">
+        <header className="mb-8 text-center">
           <h1 className="display-title mb-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Periodic Table of Elements
           </h1>

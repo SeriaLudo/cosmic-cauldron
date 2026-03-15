@@ -88,7 +88,7 @@ export default function PeriodicTable({
 
   return (
     <>
-      <div className="periodic-table-container overflow-x-auto pb-4">
+      <div className="periodic-table-container overflow-x-auto p-16">
         <div
           ref={containerRef}
           className="periodic-table relative mx-auto min-w-[900px] max-w-[1400px]"
