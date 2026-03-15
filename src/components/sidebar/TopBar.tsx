@@ -1,5 +1,5 @@
-import { useMachine } from "@xstate/react";
-import { temperatureMachine } from "../../machines/temperatureMachine";
+import { useThrottledCallback } from "@tanstack/react-pacer";
+import type { TemperatureContext, TemperatureEvent } from "../../machines/temperatureMachine";
 import {
   Flame,
   Snowflake,
@@ -10,34 +10,17 @@ import {
 } from "lucide-react";
 
 interface TopBarProps {
-  onTemperatureChange: (temperature: number) => void;
-  onActiveChange: (active: boolean) => void;
-  onReset: () => void;
+  state: { context: TemperatureContext };
+  send: (event: TemperatureEvent) => void;
 }
 
-export default function TopBar({
-  onTemperatureChange,
-  onActiveChange,
-  onReset,
-}: Readonly<TopBarProps>) {
-  const [state, send] = useMachine(temperatureMachine);
-
+export default function TopBar({ state, send }: Readonly<TopBarProps>) {
   const { temperature, isActive } = state.context;
 
-  const handleTemperatureChange = (newTemp: number) => {
-    send({ type: "SET_TEMPERATURE", temperature: newTemp });
-    onTemperatureChange(newTemp);
-  };
-
-  const handleToggle = () => {
-    send({ type: "TOGGLE_ACTIVE" });
-    onActiveChange(!isActive);
-  };
-
-  const handleReset = () => {
-    send({ type: "RESET" });
-    onReset();
-  };
+  const handleTemperatureChange = useThrottledCallback(
+    (temp: number) => send({ type: "SET_TEMPERATURE", temperature: temp }),
+    { wait: 100 }
+  );
 
   const getTempColor = () => {
     const t = Math.min(Math.max(temperature / 6000, 0), 1);
@@ -74,7 +57,7 @@ export default function TopBar({
         )}
 
         <button
-          onClick={handleToggle}
+          onClick={() => send({ type: "TOGGLE_ACTIVE" })}
           className={`rounded-full p-2 ${
             isActive
               ? "bg-[#ffd700]/20 text-[#ffd700]"
@@ -86,7 +69,7 @@ export default function TopBar({
 
         {isActive && (
           <button
-            onClick={handleReset}
+            onClick={() => send({ type: "RESET" })}
             className="rounded-full bg-white/10 p-2 text-white/50 hover:bg-white/20 hover:text-white"
           >
             <RotateCcw size={18} />

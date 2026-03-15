@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
-import { useThrottledCallback } from "@tanstack/react-pacer";
+import { useMachine } from "@xstate/react";
+import {
+  temperatureMachine,
+  getTemperatureColor,
+} from "../../machines/temperatureMachine";
 import { PeriodicTable } from "../periodic-table";
 import { Sidebar, TopBar } from "../sidebar";
-import { getTemperatureColor } from "../../machines/temperatureMachine";
 import type { Element, PeriodicTableData } from "../../types/element";
 
 export default function PeriodicTablePage() {
-  const [temperature, setTemperature] = useState(298);
-  const [isActive, setIsActive] = useState(false);
+  const [state, send] = useMachine(temperatureMachine);
   const [elements, setElements] = useState<Element[]>([]);
   const [loading, setLoading] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const { temperature, isActive } = state.context;
 
   useEffect(() => {
     fetch("/periodic-table.json")
@@ -34,42 +36,13 @@ export default function PeriodicTablePage() {
     }
   }, [temperature, isActive]);
 
-  // Throttle temperature updates to reduce re-renders when dragging the slider.
-  // Sidebar/TopBar still update their local xstate immediately for responsive UI;
-  // the route state (and PeriodicTable) updates at most every 100ms.
-  const handleTemperatureChange = useThrottledCallback(
-    (temp: number) => setTemperature(temp),
-    { wait: 100 }
-  );
-
-  const handleActiveChange = (active: boolean) => {
-    setIsActive(active);
-  };
-
-  const handleReset = () => {
-    setTemperature(298);
-    setIsActive(false);
-  };
-
   return (
     <>
       {/* Desktop Sidebar */}
-      {!loading && (
-        <Sidebar
-          elements={elements}
-          onTemperatureChange={handleTemperatureChange}
-          onActiveChange={handleActiveChange}
-          onReset={handleReset}
-          onOpenChange={setSidebarOpen}
-        />
-      )}
+      {!loading && <Sidebar state={state} send={send} elements={elements} />}
 
       {/* Mobile TopBar */}
-      <TopBar
-        onTemperatureChange={handleTemperatureChange}
-        onActiveChange={handleActiveChange}
-        onReset={handleReset}
-      />
+      <TopBar state={state} send={send} />
 
       {/* Temperature glow overlay */}
       {isActive && (

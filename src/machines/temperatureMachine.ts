@@ -5,6 +5,7 @@ export type TemperaturePhase = "solid" | "liquid" | "gas";
 export interface TemperatureContext {
   temperature: number;
   isActive: boolean;
+  sidebarOpen: boolean;
 }
 
 export type TemperatureEvent =
@@ -12,7 +13,10 @@ export type TemperatureEvent =
   | { type: "TOGGLE_ACTIVE" }
   | { type: "ACTIVATE" }
   | { type: "DEACTIVATE" }
-  | { type: "RESET" };
+  | { type: "RESET" }
+  | { type: "TOGGLE_SIDEBAR" }
+  | { type: "OPEN_SIDEBAR" }
+  | { type: "CLOSE_SIDEBAR" };
 
 /**
  * Temperature Machine
@@ -26,6 +30,7 @@ export type TemperatureEvent =
  * Context:
  * - temperature: Current temperature in Kelvin (0-6000K)
  * - isActive: Whether temperature effects are enabled
+ * - sidebarOpen: Whether the desktop sidebar panel is open
  */
 export const temperatureMachine = setup({
   types: {
@@ -55,6 +60,16 @@ export const temperatureMachine = setup({
       temperature: 298, // Room temperature ~25°C
       isActive: false,
     }),
+    // Sidebar visibility
+    toggleSidebar: assign({
+      sidebarOpen: ({ context }) => !context.sidebarOpen,
+    }),
+    openSidebar: assign({
+      sidebarOpen: true,
+    }),
+    closeSidebar: assign({
+      sidebarOpen: false,
+    }),
   },
 }).createMachine({
   id: "temperature",
@@ -62,6 +77,7 @@ export const temperatureMachine = setup({
   context: {
     temperature: 298, // Room temperature in Kelvin (~25°C)
     isActive: false,
+    sidebarOpen: false,
   },
   states: {
     // Inactive state - no temperature effects shown
@@ -81,6 +97,9 @@ export const temperatureMachine = setup({
         RESET: {
           actions: "resetTemperature",
         },
+        TOGGLE_SIDEBAR: { actions: "toggleSidebar" },
+        OPEN_SIDEBAR: { actions: "openSidebar" },
+        CLOSE_SIDEBAR: { actions: "closeSidebar" },
       },
     },
     // Active state - temperature effects enabled
@@ -100,6 +119,9 @@ export const temperatureMachine = setup({
         RESET: {
           actions: "resetTemperature",
         },
+        TOGGLE_SIDEBAR: { actions: "toggleSidebar" },
+        OPEN_SIDEBAR: { actions: "openSidebar" },
+        CLOSE_SIDEBAR: { actions: "closeSidebar" },
       },
     },
   },

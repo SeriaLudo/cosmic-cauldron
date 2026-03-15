@@ -1,51 +1,30 @@
-import { useState, useEffect, useMemo } from "react";
-import { useMachine } from "@xstate/react";
+import { useMemo } from "react";
+import { useThrottledCallback } from "@tanstack/react-pacer";
 import {
-  temperatureMachine,
   getElementPhase,
+  type TemperatureContext,
+  type TemperatureEvent,
 } from "../../machines/temperatureMachine";
 import { Power, RotateCcw, Thermometer, ChevronRight, X } from "lucide-react";
 import type { Element } from "../../types/element";
 
 interface SidebarProps {
+  state: { context: TemperatureContext };
+  send: (event: TemperatureEvent) => void;
   elements: Element[];
-  onTemperatureChange: (temperature: number) => void;
-  onActiveChange: (active: boolean) => void;
-  onReset: () => void;
-  onOpenChange: (open: boolean) => void;
 }
 
 export default function Sidebar({
+  state,
+  send,
   elements,
-  onTemperatureChange,
-  onActiveChange,
-  onReset,
-  onOpenChange,
-}: SidebarProps) {
-  const [isOpen, setIsOpen] = useState(false);
+}: Readonly<SidebarProps>) {
+  const { temperature, isActive, sidebarOpen } = state.context;
 
-  // Notify parent when open state changes
-  useEffect(() => {
-    onOpenChange(isOpen);
-  }, [isOpen, onOpenChange]);
-  const [state, send] = useMachine(temperatureMachine);
-
-  const { temperature, isActive } = state.context;
-
-  const handleTemperatureChange = (newTemp: number) => {
-    send({ type: "SET_TEMPERATURE", temperature: newTemp });
-    onTemperatureChange(newTemp);
-  };
-
-  const handleToggle = () => {
-    send({ type: "TOGGLE_ACTIVE" });
-    onActiveChange(!isActive);
-  };
-
-  const handleReset = () => {
-    send({ type: "RESET" });
-    onReset();
-  };
+  const handleTemperatureChange = useThrottledCallback(
+    (temp: number) => send({ type: "SET_TEMPERATURE", temperature: temp }),
+    { wait: 100 }
+  );
 
   // Calculate phase counts for all elements at current temperature
   const phaseCounts = useMemo(() => {
@@ -68,17 +47,17 @@ export default function Sidebar({
     <>
       {/* Toggle Button - always visible */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => send({ type: "TOGGLE_SIDEBAR" })}
         className="fixed left-0 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-r-lg bg-[#0d1b2a]/90 text-[#ffd700] backdrop-blur-sm transition-all duration-200 hover:bg-[#0d1b2a]"
-        aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
       >
-        {isOpen ? <X size={18} /> : <ChevronRight size={18} />}
+        {sidebarOpen ? <X size={18} /> : <ChevronRight size={18} />}
       </button>
 
       {/* Sidebar Panel - overlays content */}
       <aside
         className={`fixed left-0 top-0 z-40 h-screen w-64 flex-col border-r border-[#ffd700]/20 bg-[#0d1b2a]/95 backdrop-blur-sm transition-transform duration-300 hidden lg:flex ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex h-16 items-center justify-between border-b border-[#ffd700]/20 px-4">
@@ -87,7 +66,7 @@ export default function Sidebar({
             <span className="text-lg font-bold text-white">Temperature</span>
           </div>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => send({ type: "CLOSE_SIDEBAR" })}
             className="rounded p-1 text-white/50 hover:bg-white/10 hover:text-white"
             aria-label="Close sidebar"
           >
@@ -98,7 +77,7 @@ export default function Sidebar({
         <div className="flex flex-1 flex-col gap-4 p-4">
           {/* Power Toggle */}
           <button
-            onClick={handleToggle}
+            onClick={() => send({ type: "TOGGLE_ACTIVE" })}
             className={`flex items-center justify-center gap-3 rounded-lg p-3 transition-all ${
               isActive
                 ? "bg-[#ffd700]/20 text-[#ffd700]"
@@ -114,12 +93,16 @@ export default function Sidebar({
             <>
               {/* Temperature Slider */}
               <div className="flex flex-col gap-2">
-                <label className="text-xs text-white/60 uppercase tracking-wider">
+                <label
+                  htmlFor="sidebar-temperature-slider"
+                  className="text-xs text-white/60 uppercase tracking-wider"
+                >
                   Temperature
                 </label>
 
                 <div className="flex items-center gap-3">
                   <input
+                    id="sidebar-temperature-slider"
                     type="range"
                     min="0"
                     max="6000"
@@ -184,7 +167,7 @@ export default function Sidebar({
 
               {/* Reset Button */}
               <button
-                onClick={handleReset}
+                onClick={() => send({ type: "RESET" })}
                 className="flex items-center justify-center gap-2 rounded-lg bg-white/5 p-2 text-white/60 hover:bg-white/10 hover:text-white"
                 title="Reset temperature"
               >
