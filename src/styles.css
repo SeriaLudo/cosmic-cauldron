@@ -268,6 +268,8 @@ a {
 .element-card {
   min-width: 48px;
   min-height: 56px;
+  content-visibility: auto;
+  contain-intrinsic-size: 56px 48px;
 }
 
 .element-number {
@@ -290,6 +292,7 @@ a {
   .element-card {
     min-width: 36px;
     min-height: 42px;
+    contain-intrinsic-size: 42px 36px;
   }
 
   .element-number {
@@ -418,6 +421,14 @@ a {
   50% {
     transform: scale(1.02);
   }
+}
+
+/* Pause phase animations when an element is outside the scroll viewport. */
+.element-card[data-inview="0"] {
+  animation-play-state: paused !important;
+}
+.element-card[data-inview="0"]::before {
+  animation-play-state: paused !important;
 }
 
 /* Pause phase animation on hover/focus so the highlight takes priority */
