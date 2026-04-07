@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, type RefObject } from "react";
 
 interface UseDatasetInViewObserverOptions {
   /**
-   * Element that defines the scroll viewport. Usually the scroll container.
+   * Ref whose current element defines the scroll viewport.
    * If null, the hook does nothing.
    */
-  root: HTMLElement | null;
+  rootRef: RefObject<HTMLElement | null>;
   /** CSS selector for items inside `root` to observe. */
   targetSelector: string;
   /** Root margin passed to IntersectionObserver. */
@@ -40,7 +40,7 @@ interface UseDatasetInViewObserverOptions {
 }
 
 export function useDatasetInViewObserver({
-  root,
+  rootRef,
   targetSelector,
   rootMargin = "0px",
   threshold = 0,
@@ -52,6 +52,7 @@ export function useDatasetInViewObserver({
 }: UseDatasetInViewObserverOptions) {
   useEffect(() => {
     if (!enabled) return;
+    const root = rootRef.current;
     if (!root) return;
 
     const targets = Array.from(root.querySelectorAll<HTMLElement>(targetSelector));
@@ -75,6 +76,16 @@ export function useDatasetInViewObserver({
     for (const el of targets) io.observe(el);
     return () => io.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, root, targetSelector, rootMargin, datasetKey, inValue, outValue, threshold, ...deps]);
+  }, [
+    enabled,
+    rootRef,
+    targetSelector,
+    rootMargin,
+    datasetKey,
+    inValue,
+    outValue,
+    threshold,
+    ...deps,
+  ]);
 }
 

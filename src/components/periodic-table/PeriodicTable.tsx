@@ -52,7 +52,7 @@ export default function PeriodicTable({
 
   useDatasetInViewObserver({
     enabled: isActive,
-    root: containerRef.current,
+    rootRef: containerRef,
     targetSelector: ".periodic-table .element-card",
     datasetKey: "inview",
     rootMargin: "120px",
