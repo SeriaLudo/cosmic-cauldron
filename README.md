@@ -2,6 +2,8 @@
 
 An interactive periodic table of elements built with modern web technologies, featuring a cosmic night sky theme.
 
+Currently hosted at: https://luxury-kitten-a9e8d8.netlify.app/
+
 ## Getting Started
 
 ```bash
