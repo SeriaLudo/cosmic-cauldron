@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Element, PeriodicTableData } from "../../types/element";
 import type { TemperaturePhase } from "../../machines/temperatureMachine";
 import { getElementPhase } from "../../machines/temperatureMachine";
 import ElementCard from "./ElementCard";
 import ElementModal from "./ElementModal";
-import { useDatasetInViewObserver } from "../../hooks/useDatasetInViewObserver";
 
 interface PeriodicTableProps {
   temperature?: number;
@@ -19,7 +18,6 @@ export default function PeriodicTable({
   const [selectedElement, setSelectedElement] = useState<Element | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetch("/periodic-table.json")
@@ -50,16 +48,6 @@ export default function PeriodicTable({
     return phases;
   }, [elements, temperature]);
 
-  useDatasetInViewObserver({
-    enabled: isActive,
-    root: containerRef.current,
-    targetSelector: ".periodic-table .element-card",
-    datasetKey: "inview",
-    rootMargin: "120px",
-    threshold: 0.01,
-    deps: [elements.length],
-  });
-
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -78,10 +66,7 @@ export default function PeriodicTable({
 
   return (
     <>
-      <div
-        ref={containerRef}
-        className="periodic-table-container overflow-x-auto p-16"
-      >
+      <div className="periodic-table-container overflow-x-auto p-16">
         <div className="periodic-table relative mx-auto min-w-[900px] max-w-[1400px]">
           {elements.map((element) => (
             <ElementCard
