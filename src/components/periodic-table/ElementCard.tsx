@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { forwardRef, memo } from "react";
 import clsx from "clsx";
 import type { Element } from "#/types/element";
 import type { TemperaturePhase } from "#/machines/temperatureMachine";
@@ -9,13 +9,14 @@ interface ElementCardProps {
   onClick: () => void;
 }
 
-function ElementCard({
-  element,
-  phase,
-  onClick,
-}: Readonly<ElementCardProps>) {
+const ElementCard = memo(
+  forwardRef<HTMLButtonElement, ElementCardProps>(function ElementCard(
+    { element, phase, onClick },
+    ref
+  ) {
   return (
     <button
+      ref={ref}
       type="button"
       onClick={onClick}
       className={clsx(
@@ -47,11 +48,10 @@ function ElementCard({
       </span>
     </button>
   );
-}
-
-export default memo(ElementCard, (prevProps, nextProps) => {
-  return (
+  }),
+  (prevProps, nextProps) =>
     prevProps.element.number === nextProps.element.number &&
     prevProps.phase === nextProps.phase
-  );
-});
+);
+
+export default ElementCard;
